@@ -3,19 +3,19 @@
 [![CI](https://github.com/IbanCoulibaly/robotic-arm/actions/workflows/ci.yml/badge.svg)](https://github.com/IbanCoulibaly/robotic-arm/actions/workflows/ci.yml)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)](firmware)
 [![Platform: ESP32](https://img.shields.io/badge/platform-ESP32-E7352C?logo=espressif&logoColor=white)](docs/WIRING.md)
+[![Status: Finished](https://img.shields.io/badge/status-finished-brightgreen)](docs/ARCHITECTURE.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A PS4-controller-driven robot: a 4-DOF arm, a two-wheel drivetrain, a
-text-to-speech voice, and a display that shows facial expressions — all
-running on a single ESP32. Built as a two-part project: **Part A** (this
-repo's firmware target) is fully manual, human-in-the-loop control; **Part
-B** (roadmap) adds a camera and onboard autonomy.
+**Status: finished.** A 3-servo robot arm, controlled directly by a PS4
+DualShock controller through an ESP32 and a PCA9685 PWM driver. That's the
+complete, working system — no drivetrain, camera, display, or speaker.
 
-The firmware's control logic — deadzone filtering, drive mixing, servo angle
-mapping, joint safety limits, and the facial-expression state machine — is
-written as plain, hardware-independent C++ and covered by a native unit test
-suite: **23 test cases, 203 assertions, 100% line coverage**, running in CI
-on every push. See [Testing & Metrics](#testing--metrics).
+The firmware's control logic — joystick deadzone filtering, axis
+normalization, and servo angle mapping with per-joint mechanical safety
+limits — is written as plain, hardware-independent C++ and covered by a
+native unit test suite: **12 test cases, 28 assertions, 100% line
+coverage**, running in CI on every push. See
+[Testing & Metrics](#testing--metrics).
 
 ## Table of contents
 
@@ -24,19 +24,18 @@ on every push. See [Testing & Metrics](#testing--metrics).
 - [Hardware](#hardware)
 - [Getting started](#getting-started)
 - [Testing & metrics](#testing--metrics)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## How it works
 
 A PS4 DualShock controller pairs to the ESP32 over Bluetooth. On every
-~20 ms control-loop tick, the firmware reads the controller's stick and
-button state, and turns it into four simultaneous outputs: drivetrain motor
-speeds, four servo angles (base/shoulder/elbow/gripper), an optional TTS
-trigger, and a facial expression on the display.
+~20 ms control-loop tick, the firmware reads three stick axes and maps each
+one directly to a servo joint: left stick Y → base, right stick X →
+shoulder, right stick Y → elbow. Each axis is deadzone-filtered, then
+mapped to an angle that is clamped to that joint's configured safe range,
+then converted to a PWM pulse and written to the PCA9685 over I2C.
 
-**System architecture** — which board talks to which peripheral over which bus:
+**System architecture** — the complete, finished wiring:
 
 ![System architecture](docs/diagrams/system-architecture.svg)
 
@@ -50,33 +49,25 @@ logic can be unit-tested on a laptop with no robot attached:
 
 ![Control loop sequence](docs/diagrams/control-loop-sequence.svg)
 
-**Facial expression state machine** — priority is speaking-overrides-all,
-then the held emotion button, then neutral:
-
-![Expression state machine](docs/diagrams/expression-state-machine.svg)
-
-Deeper design rationale (bus choices, chassis material trade-offs, why the
-logic/hardware split exists) lives in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Deeper design rationale (bus choice, why the logic/hardware split exists,
+and what was originally scoped but not built) lives in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Repository structure
 
 ```
 robotic-arm/
 ├── firmware/
-│   ├── include/            # Public headers for the logic layer
+│   ├── include/                   # Public headers for the logic layer
 │   │   ├── controller_input.h
-│   │   ├── motion_control.h
-│   │   ├── servo_control.h
-│   │   └── expression_engine.h
+│   │   └── servo_control.h
 │   └── src/
 │       ├── controller_input.cpp   # Deadzone + stick normalization
-│       ├── motion_control.cpp     # Arcade-drive mixing
 │       ├── servo_control.cpp      # Angle<->pulse mapping, joint limits
-│       ├── expression_engine.cpp  # Facial-expression state machine
 │       └── main.cpp               # ESP32 entry point (hardware glue only)
 ├── test/
 │   ├── minitest.h           # ~80-line dependency-free test framework
-│   └── test_main.cpp        # 23 unit tests for the logic layer
+│   └── test_main.cpp        # 12 unit tests for the logic layer
 ├── scripts/
 │   └── run_tests.sh         # Build, run, and report coverage locally / in CI
 ├── docs/
@@ -92,10 +83,9 @@ robotic-arm/
 Full bill of materials: [docs/BOM.md](docs/BOM.md).
 Pin map and bus assignments: [docs/WIRING.md](docs/WIRING.md).
 
-Core components: ESP32 DevKit · PCA9685 servo driver · L298N motor driver ·
-PS4 DualShock controller · DFPlayer Mini (TTS) · LCD/OLED face display ·
-3D-printed single arm ([reference model](https://www.printables.com/model/818975-compact-robot-arm-arduino-3d-printed/files)) ·
-tank-track chassis ([reference model](https://www.thingiverse.com/thing:971568/files)).
+Complete component list: ESP32 DevKit · PCA9685 servo driver · 3 servo
+motors (base/shoulder/elbow) · PS4 DualShock controller · 3D-printed single
+arm ([reference model](https://www.printables.com/model/818975-compact-robot-arm-arduino-3d-printed/files)).
 
 ## Getting started
 
@@ -106,7 +96,8 @@ tank-track chassis ([reference model](https://www.thingiverse.com/thing:971568/f
    `Adafruit_PWMServoDriver`, `Wire` (bundled).
 2. Open `firmware/src/main.cpp` as a sketch (or load the `firmware/` folder
    in PlatformIO using an `esp32dev` environment).
-3. Wire the board per [docs/WIRING.md](docs/WIRING.md).
+3. Wire the board per [docs/WIRING.md](docs/WIRING.md) — it's just I2C to
+   the PCA9685 and Bluetooth to the controller.
 4. Set your PS4 controller's MAC in `PS4.begin("...")` if you want to pair
    to one specific controller.
 5. Flash, power on, and pair the controller.
@@ -132,44 +123,22 @@ see the badge at the top of this README.
 
 | Metric | Result |
 |---|---|
-| Test cases | 23 |
-| Assertions | 203 |
+| Test cases | 12 |
+| Assertions | 28 |
 | Failures | 0 |
 | `controller_input.cpp` line coverage | 100% (9/9 lines) |
-| `motion_control.cpp` line coverage | 100% (12/12 lines) |
 | `servo_control.cpp` line coverage | 100% (16/16 lines) |
-| `expression_engine.cpp` line coverage | 100% (8/8 lines) |
 
-What's covered: joystick deadzone edge cases, arcade-drive mixing (including
-that full-throttle + full-turn scales down instead of clipping and silently
-losing the turn), servo angle↔pulse mapping at its endpoints and midpoint,
-out-of-range input clamping for both sticks and angles, per-joint mechanical
-safety limits, and every transition in the facial-expression priority order
-(speaking overrides all emotion buttons).
+What's covered: joystick deadzone edge cases (including a custom deadzone
+width), stick-axis normalization at its endpoints and midpoint, servo
+angle↔pulse mapping at its endpoints and midpoint, out-of-range input
+clamping for both sticks and angles, and that every joint's configured
+safety range is internally consistent (`min < max`).
 
 `main.cpp` is intentionally excluded from this suite — it's ESP32-only
 hardware glue (`PS4Controller`, `Wire`, `Adafruit_PWMServoDriver`) with no
-branching logic of its own to test; its correctness is validated on real
-hardware instead.
-
-## Roadmap
-
-- [x] **Part A** — manual control: drivetrain, 4-DOF arm, facial
-      expressions, TTS hook, fully unit-tested control logic.
-- [ ] **Part A** — hardware bring-up: wire the physical PCA9685 / L298N /
-      DFPlayer Mini / display, tune joint limits to the real arm.
-- [ ] **Part B** — ESP32-CAM-based obstacle/vision awareness.
-- [ ] **Part B** — autonomous navigation.
-- [ ] **Part B** — AI-driven speech interaction.
-
-Full details: [docs/ARCHITECTURE.md#roadmap](docs/ARCHITECTURE.md#roadmap).
-
-## Contributing
-
-Issues and PRs welcome. If you're changing control logic in
-`firmware/include`/`firmware/src`, add or update a test in
-`test/test_main.cpp` and run `./scripts/run_tests.sh` before opening a PR —
-CI will run the same script.
+branching logic of its own to test; its correctness is validated on the
+real arm instead.
 
 ## License
 

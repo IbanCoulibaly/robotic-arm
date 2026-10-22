@@ -1,95 +1,34 @@
-<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
     </marker>
-    <marker id="arrowDashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
-    </marker>
   </defs>
 
-  <rect x="0" y="0" width="1000" height="700" fill="#ffffff"/>
+  <rect x="0" y="0" width="760" height="420" fill="#ffffff"/>
 
-  <text x="500" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Robotic Arm — System Architecture</text>
-  <text x="500" y="48" text-anchor="middle" font-size="13" fill="#64748b">Solid = Part A (manual control, built).  Dashed = Part B (autonomy, future).</text>
+  <text x="380" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Robotic Arm — System Architecture</text>
+  <text x="380" y="48" text-anchor="middle" font-size="13" fill="#64748b">Finished build: PS4 controller → ESP32 → PCA9685 → 3-servo arm. Nothing else is wired up.</text>
 
-  <!-- Row 1: controller + camera -->
-  <rect x="40" y="70" width="220" height="64" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-  <text x="150" y="97" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a">PS4 DualShock Controller</text>
-  <text x="150" y="116" text-anchor="middle" font-size="11" fill="#475569">Driver input (sticks + buttons)</text>
+  <!-- PS4 controller -->
+  <rect x="270" y="80" width="220" height="64" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
+  <text x="380" y="107" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a">PS4 DualShock Controller</text>
+  <text x="380" y="126" text-anchor="middle" font-size="11" fill="#475569">Left stick Y, right stick X/Y</text>
 
-  <rect x="740" y="70" width="220" height="64" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
-  <text x="850" y="97" text-anchor="middle" font-size="14" font-weight="600" fill="#334155">ESP32-CAM (Part B)</text>
-  <text x="850" y="116" text-anchor="middle" font-size="11" fill="#64748b">Vision for autonomous nav</text>
+  <!-- ESP32 -->
+  <rect x="210" y="200" width="340" height="86" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
+  <text x="380" y="230" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">ESP32 DevKit</text>
+  <text x="380" y="250" text-anchor="middle" font-size="12" fill="#1e3a8a">Reads controller input, maps each axis to a</text>
+  <text x="380" y="266" text-anchor="middle" font-size="12" fill="#1e3a8a">clamped joint angle, drives the servo driver</text>
 
-  <!-- Row 2: ESP32 brain -->
-  <rect x="330" y="190" width="340" height="90" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
-  <text x="500" y="222" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">ESP32 DevKit</text>
-  <text x="500" y="242" text-anchor="middle" font-size="12" fill="#1e3a8a">System brain — reads controller input,</text>
-  <text x="500" y="258" text-anchor="middle" font-size="12" fill="#1e3a8a">runs control loop, drives all peripherals</text>
+  <line x1="380" y1="144" x2="380" y2="200" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="400" y="176" font-size="11" fill="#475569" font-style="italic">Bluetooth</text>
 
-  <!-- arrows into ESP32 -->
-  <line x1="155" y1="134" x2="400" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="230" y="155" font-size="11" fill="#475569" font-style="italic">Bluetooth</text>
+  <!-- PCA9685 -->
+  <rect x="250" y="320" width="260" height="66" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+  <text x="380" y="347" text-anchor="middle" font-size="14" font-weight="700" fill="#064e3b">PCA9685 → 3-Servo Arm</text>
+  <text x="380" y="365" text-anchor="middle" font-size="11" fill="#065f46">Base · Shoulder · Elbow (ch 0, 1, 2)</text>
 
-  <line x1="845" y1="134" x2="600" y2="190" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowDashed)"/>
-  <text x="700" y="155" font-size="11" fill="#64748b" font-style="italic">Wi-Fi (Part B)</text>
-
-  <!-- Row 3: peripheral drivers -->
-  <rect x="30" y="350" width="200" height="66" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-  <text x="130" y="377" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">PCA9685</text>
-  <text x="130" y="394" text-anchor="middle" font-size="11" fill="#475569">16-ch PWM servo driver</text>
-
-  <rect x="270" y="350" width="200" height="66" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-  <text x="370" y="377" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">L298N</text>
-  <text x="370" y="394" text-anchor="middle" font-size="11" fill="#475569">Dual H-bridge motor driver</text>
-
-  <rect x="510" y="350" width="220" height="66" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-  <text x="620" y="377" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">DFPlayer Mini</text>
-  <text x="620" y="394" text-anchor="middle" font-size="11" fill="#475569">Text-to-speech / audio playback</text>
-
-  <rect x="770" y="350" width="200" height="66" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-  <text x="870" y="377" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Display</text>
-  <text x="870" y="394" text-anchor="middle" font-size="11" fill="#475569">Facial expressions (I2C/SPI)</text>
-
-  <!-- arrows ESP32 -> row 3 -->
-  <line x1="400" y1="280" x2="140" y2="350" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="200" y="320" font-size="11" fill="#475569" font-style="italic">I2C (GPIO 21/22)</text>
-
-  <line x1="450" y1="280" x2="380" y2="350" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="400" y="330" font-size="11" fill="#475569" font-style="italic">GPIO / PWM</text>
-
-  <line x1="550" y1="280" x2="610" y2="350" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="565" y="330" font-size="11" fill="#475569" font-style="italic">UART</text>
-
-  <line x1="600" y1="280" x2="860" y2="350" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="780" y="320" font-size="11" fill="#475569" font-style="italic">I2C / SPI</text>
-
-  <!-- Row 4: physical outputs -->
-  <rect x="20" y="490" width="220" height="70" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
-  <text x="130" y="518" text-anchor="middle" font-size="13" font-weight="600" fill="#064e3b">Servo Arm</text>
-  <text x="130" y="535" text-anchor="middle" font-size="11" fill="#065f46">Base · Shoulder · Elbow · Gripper</text>
-
-  <rect x="270" y="490" width="200" height="70" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
-  <text x="370" y="518" text-anchor="middle" font-size="13" font-weight="600" fill="#064e3b">Drivetrain</text>
-  <text x="370" y="535" text-anchor="middle" font-size="11" fill="#065f46">L/R DC motors → wheels</text>
-
-  <rect x="540" y="490" width="160" height="60" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
-  <text x="620" y="525" text-anchor="middle" font-size="13" font-weight="600" fill="#064e3b">Speaker</text>
-
-  <rect x="790" y="490" width="160" height="60" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
-  <text x="870" y="525" text-anchor="middle" font-size="13" font-weight="600" fill="#064e3b">Robot Face</text>
-
-  <!-- arrows row3 -> row4 -->
-  <line x1="130" y1="416" x2="130" y2="490" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="138" y="455" font-size="11" fill="#475569" font-style="italic">PWM ×4</text>
-
-  <line x1="370" y1="416" x2="370" y2="490" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="620" y1="416" x2="620" y2="490" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="870" y1="416" x2="870" y2="490" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Power note -->
-  <rect x="40" y="600" width="920" height="70" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
-  <text x="500" y="627" text-anchor="middle" font-size="13" font-weight="600" fill="#78350f">⚡ Power</text>
-  <text x="500" y="647" text-anchor="middle" font-size="11.5" fill="#92400e">Shared battery pack (LiPo/NiMH, 6–12&#160;V) → buck/linear regulators → 5&#160;V rail for ESP32, PCA9685 &amp; logic; motors driven near pack voltage through the L298N. See docs/WIRING.md.</text>
+  <line x1="380" y1="286" x2="380" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="400" y="306" font-size="11" fill="#475569" font-style="italic">I2C (GPIO 21/22) — setPWM ×3</text>
 </svg>

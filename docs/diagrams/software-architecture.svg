@@ -1,4 +1,4 @@
-<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
   <defs>
     <marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
@@ -8,65 +8,45 @@
     </marker>
   </defs>
 
-  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
-  <text x="500" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Software Architecture — Logic / Hardware Split</text>
-  <text x="500" y="48" text-anchor="middle" font-size="13" fill="#64748b">The same four pure-C++ modules are driven by real hardware on-target and by the native test suite on a laptop.</text>
+  <rect x="0" y="0" width="900" height="480" fill="#ffffff"/>
+  <text x="450" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Software Architecture — Logic / Hardware Split</text>
+  <text x="450" y="48" text-anchor="middle" font-size="13" fill="#64748b">The same two pure-C++ modules are driven by real hardware on-target and by the native test suite on a laptop.</text>
 
   <!-- main.cpp -->
-  <rect x="330" y="70" width="340" height="86" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
-  <text x="500" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">main.cpp</text>
-  <text x="500" y="117" text-anchor="middle" font-size="11.5" fill="#1e3a8a">ESP32 target · Arduino.h, Wire.h,</text>
-  <text x="500" y="133" text-anchor="middle" font-size="11.5" fill="#1e3a8a">PS4Controller.h, Adafruit_PWMServoDriver.h</text>
+  <rect x="280" y="70" width="340" height="86" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
+  <text x="450" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">main.cpp</text>
+  <text x="450" y="117" text-anchor="middle" font-size="11.5" fill="#1e3a8a">ESP32 target · Arduino.h, Wire.h,</text>
+  <text x="450" y="133" text-anchor="middle" font-size="11.5" fill="#1e3a8a">PS4Controller.h, Adafruit_PWMServoDriver.h</text>
 
   <!-- module row -->
   <g>
-    <rect x="40" y="235" width="200" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-    <text x="140" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">controller_input</text>
-    <text x="140" y="283" text-anchor="middle" font-size="10.5" fill="#475569">deadzone + axis</text>
-    <text x="140" y="298" text-anchor="middle" font-size="10.5" fill="#475569">normalization</text>
+    <rect x="130" y="235" width="260" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
+    <text x="260" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">controller_input</text>
+    <text x="260" y="283" text-anchor="middle" font-size="10.5" fill="#475569">deadzone + axis</text>
+    <text x="260" y="298" text-anchor="middle" font-size="10.5" fill="#475569">normalization</text>
   </g>
 
   <g>
-    <rect x="280" y="235" width="200" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-    <text x="380" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">motion_control</text>
-    <text x="380" y="283" text-anchor="middle" font-size="10.5" fill="#475569">arcade drive mixing,</text>
-    <text x="380" y="298" text-anchor="middle" font-size="10.5" fill="#475569">PWM clamping</text>
-  </g>
-
-  <g>
-    <rect x="520" y="235" width="200" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-    <text x="620" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">servo_control</text>
-    <text x="620" y="283" text-anchor="middle" font-size="10.5" fill="#475569">angle→pulse mapping,</text>
-    <text x="620" y="298" text-anchor="middle" font-size="10.5" fill="#475569">per-joint safety limits</text>
-  </g>
-
-  <g>
-    <rect x="760" y="235" width="200" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
-    <text x="860" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">expression_engine</text>
-    <text x="860" y="283" text-anchor="middle" font-size="10.5" fill="#475569">button → facial</text>
-    <text x="860" y="298" text-anchor="middle" font-size="10.5" fill="#475569">expression state machine</text>
+    <rect x="510" y="235" width="260" height="90" rx="10" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
+    <text x="640" y="265" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">servo_control</text>
+    <text x="640" y="283" text-anchor="middle" font-size="10.5" fill="#475569">angle→pulse mapping,</text>
+    <text x="640" y="298" text-anchor="middle" font-size="10.5" fill="#475569">per-joint safety limits</text>
   </g>
 
   <!-- main.cpp -> modules -->
-  <line x1="420" y1="156" x2="160" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
-  <line x1="460" y1="156" x2="390" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
-  <line x1="540" y1="156" x2="610" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
-  <line x1="580" y1="156" x2="840" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
-  <text x="500" y="200" text-anchor="middle" font-size="11.5" fill="#1d4ed8" font-style="italic">calls, every ~20&#160;ms control-loop tick</text>
+  <line x1="390" y1="156" x2="290" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
+  <line x1="510" y1="156" x2="610" y2="235" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrowB)"/>
+  <text x="450" y="200" text-anchor="middle" font-size="11.5" fill="#1d4ed8" font-style="italic">calls, every ~20&#160;ms control-loop tick</text>
 
   <!-- test_main.cpp -->
-  <rect x="330" y="400" width="340" height="94" rx="10" fill="#dcfce7" stroke="#047857" stroke-width="2.5"/>
-  <text x="500" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="#064e3b">test_main.cpp</text>
-  <text x="500" y="445" text-anchor="middle" font-size="11.5" fill="#065f46">Native host · plain g++ -std=c++17</text>
-  <text x="500" y="461" text-anchor="middle" font-size="11.5" fill="#065f46">23 test cases · 203 assertions · 100% line coverage</text>
-  <text x="500" y="477" text-anchor="middle" font-size="11.5" fill="#065f46">No Arduino toolchain or hardware required</text>
+  <rect x="280" y="360" width="340" height="94" rx="10" fill="#dcfce7" stroke="#047857" stroke-width="2.5"/>
+  <text x="450" y="386" text-anchor="middle" font-size="15" font-weight="700" fill="#064e3b">test_main.cpp</text>
+  <text x="450" y="405" text-anchor="middle" font-size="11.5" fill="#065f46">Native host · plain g++ -std=c++17</text>
+  <text x="450" y="421" text-anchor="middle" font-size="11.5" fill="#065f46">12 test cases · 28 assertions · 100% line coverage</text>
+  <text x="450" y="437" text-anchor="middle" font-size="11.5" fill="#065f46">No Arduino toolchain or hardware required</text>
 
   <!-- modules -> test_main.cpp -->
-  <line x1="160" y1="325" x2="420" y2="400" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
-  <line x1="390" y1="325" x2="460" y2="400" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
-  <line x1="610" y1="325" x2="540" y2="400" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
-  <line x1="840" y1="325" x2="580" y2="400" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
-  <text x="500" y="378" text-anchor="middle" font-size="11.5" fill="#047857" font-style="italic">exercised by (scripts/run_tests.sh, CI)</text>
-
-  <text x="500" y="530" text-anchor="middle" font-size="12" fill="#64748b">main.cpp and test_main.cpp never call each other — they are two independent drivers of the same logic.</text>
+  <line x1="290" y1="325" x2="400" y2="360" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
+  <line x1="610" y1="325" x2="500" y2="360" stroke="#047857" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowG)"/>
+  <text x="450" y="347" text-anchor="middle" font-size="11.5" fill="#047857" font-style="italic">exercised by (scripts/run_tests.sh, CI)</text>
 </svg>

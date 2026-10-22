@@ -21,9 +21,7 @@ mkdir -p "$BUILD_DIR"
 # PS4Controller.h, none of which exist off-target.
 SOURCES=(
   "$SRC_DIR/controller_input.cpp"
-  "$SRC_DIR/motion_control.cpp"
   "$SRC_DIR/servo_control.cpp"
-  "$SRC_DIR/expression_engine.cpp"
   "$TEST_DIR/test_main.cpp"
 )
 

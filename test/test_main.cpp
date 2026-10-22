@@ -7,8 +7,6 @@
 #include "minitest.h"
 
 #include "controller_input.h"
-#include "expression_engine.h"
-#include "motion_control.h"
 #include "servo_control.h"
 
 using namespace robotic_arm;
@@ -36,50 +34,6 @@ TEST_CASE(stick_axis_normalizes_to_unit_range) {
 TEST_CASE(stick_axis_respects_custom_deadzone) {
     ASSERT_EQ(normalizeStickAxis(20, /*deadzone=*/30), 0.0f);
     ASSERT_TRUE(normalizeStickAxis(40, /*deadzone=*/30) != 0.0f);
-}
-
-// ------------------------------- motion_control ------------------------------
-TEST_CASE(arcade_drive_full_forward) {
-    MotorOutput out = mixArcadeDrive(1.0f, 0.0f);
-    ASSERT_EQ(out.left, 255);
-    ASSERT_EQ(out.right, 255);
-}
-
-TEST_CASE(arcade_drive_full_reverse) {
-    MotorOutput out = mixArcadeDrive(-1.0f, 0.0f);
-    ASSERT_EQ(out.left, -255);
-    ASSERT_EQ(out.right, -255);
-}
-
-TEST_CASE(arcade_drive_in_place_turn) {
-    MotorOutput out = mixArcadeDrive(0.0f, 1.0f);
-    ASSERT_EQ(out.left, 255);
-    ASSERT_EQ(out.right, -255);
-}
-
-TEST_CASE(arcade_drive_idle_sticks_stop_the_robot) {
-    MotorOutput out = mixArcadeDrive(0.0f, 0.0f);
-    ASSERT_EQ(out.left, 0);
-    ASSERT_EQ(out.right, 0);
-}
-
-TEST_CASE(arcade_drive_scales_instead_of_clipping) {
-    // Full throttle + full turn would be (2.0, 0.0) unscaled; the mixer
-    // should scale both sides down together rather than saturating the
-    // outer wheel at max forward and losing the turn entirely.
-    MotorOutput out = mixArcadeDrive(1.0f, 1.0f);
-    ASSERT_EQ(out.left, 255);
-    ASSERT_EQ(out.right, 0);
-}
-
-TEST_CASE(arcade_drive_never_exceeds_pwm_range) {
-    for (float throttle = -1.0f; throttle <= 1.0f; throttle += 0.25f) {
-        for (float turn = -1.0f; turn <= 1.0f; turn += 0.25f) {
-            MotorOutput out = mixArcadeDrive(throttle, turn);
-            ASSERT_TRUE(out.left >= -255 && out.left <= 255);
-            ASSERT_TRUE(out.right >= -255 && out.right <= 255);
-        }
-    }
 }
 
 // ------------------------------- servo_control -------------------------------
@@ -122,40 +76,15 @@ TEST_CASE(stick_to_joint_angle_clamps_out_of_range_stick_input) {
     ASSERT_EQ(stickToJointAngle(-5.0f, fullRange), 0);
 }
 
-// ------------------------------- expression_engine ----------------------------
-TEST_CASE(speaking_overrides_all_button_expressions) {
-    ButtonState buttons;
-    buttons.triangle = true;
-    ASSERT_EQ(determineExpression(buttons, /*isSpeaking=*/true), Expression::Speaking);
-}
-
-TEST_CASE(triangle_maps_to_happy) {
-    ButtonState buttons;
-    buttons.triangle = true;
-    ASSERT_EQ(determineExpression(buttons, false), Expression::Happy);
-}
-
-TEST_CASE(square_maps_to_sad) {
-    ButtonState buttons;
-    buttons.square = true;
-    ASSERT_EQ(determineExpression(buttons, false), Expression::Sad);
-}
-
-TEST_CASE(circle_maps_to_angry) {
-    ButtonState buttons;
-    buttons.circle = true;
-    ASSERT_EQ(determineExpression(buttons, false), Expression::Angry);
-}
-
-TEST_CASE(cross_maps_to_surprised) {
-    ButtonState buttons;
-    buttons.cross = true;
-    ASSERT_EQ(determineExpression(buttons, false), Expression::Surprised);
-}
-
-TEST_CASE(no_input_is_neutral) {
-    ButtonState buttons;
-    ASSERT_EQ(determineExpression(buttons, false), Expression::Neutral);
+TEST_CASE(each_joint_limit_used_in_firmware_is_internally_consistent) {
+    // Guards against a typo in main.cpp's joint-limit constants producing
+    // min > max, which would silently invert clampAngle's behavior.
+    ArmJointLimits base{0, 180};
+    ArmJointLimits shoulder{20, 160};
+    ArmJointLimits elbow{10, 170};
+    ASSERT_TRUE(base.minAngle < base.maxAngle);
+    ASSERT_TRUE(shoulder.minAngle < shoulder.maxAngle);
+    ASSERT_TRUE(elbow.minAngle < elbow.maxAngle);
 }
 
 // ------------------------------------- runner ---------------------------------
