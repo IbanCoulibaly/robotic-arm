@@ -2,7 +2,7 @@
 
 ## Status: finished
 
-This project is complete as scoped: a single 3-servo arm, controlled
+This project is complete as scoped: a single 5-servo arm, controlled
 directly by a PS4 controller through an ESP32. There is no drivetrain,
 camera, facial-expression display, or speaker — those appeared in the
 original brainstorm but were never built, and are not part of this
@@ -10,9 +10,10 @@ repository.
 
 ## Overview
 
-One ESP32 reads a PS4 controller's left/right stick axes over Bluetooth and
-turns them directly into three servo angles — base, shoulder, elbow — via a
-PCA9685 PWM driver over I2C. That's the whole system.
+One ESP32 reads a PS4 controller's two sticks and R2 trigger over
+Bluetooth and turns them directly into five servo angles — base, shoulder,
+elbow, and wrist (four 20kg digital servos), plus a 9g micro servo gripper
+— via a PCA9685 PWM driver over I2C. That's the whole system.
 
 See the system block diagram:
 [`docs/diagrams/system-architecture.svg`](diagrams/system-architecture.svg).
@@ -21,7 +22,7 @@ See the system block diagram:
 
 | Subsystem | Bus | Why |
 |---|---|---|
-| PCA9685 (servo driver) | I2C | Offloads PWM generation for 3 servos so the ESP32's own timers aren't contended |
+| PCA9685 (servo driver) | I2C | Offloads PWM generation for 5 servos so the ESP32's own timers aren't contended |
 | PS4 controller | Bluetooth (ESP32's built-in radio) | No extra communication module needed |
 
 Full pin map: [`docs/WIRING.md`](WIRING.md).
@@ -31,8 +32,9 @@ Full pin map: [`docs/WIRING.md`](WIRING.md).
 The arm itself is the 3D-printed
 ["compact robot arm"](https://www.printables.com/model/818975-compact-robot-arm-arduino-3d-printed/files)
 design, assembled with the screws/glue/padding listed in
-[`docs/BOM.md`](BOM.md), driven by 3 servos (base rotation, shoulder,
-elbow).
+[`docs/BOM.md`](BOM.md), driven by 4 high-torque (20kg) digital servos for
+base rotation, shoulder, elbow, and wrist, plus a 9g micro servo for the
+gripper.
 
 ## Software architecture
 
@@ -47,9 +49,14 @@ The firmware is split into two kinds of code:
 2. **Decision logic** — `firmware/include/*.h` + `firmware/src/*.cpp`
    (everything except `main.cpp`). Plain, portable C++ with zero Arduino
    dependencies:
-   - `controller_input` — deadzone filtering and axis normalization.
+   - `controller_input` — deadzone filtering for the two sticks, plus
+     separate normalization for the R2 analog trigger (0–255 unsigned,
+     unlike the sticks' -127..127 signed range).
    - `servo_control` — angle↔PWM-pulse mapping and per-joint mechanical
-     safety clamps.
+     safety clamps, with two mapping functions: `stickToJointAngle()` for
+     the four stick-driven joints (centered at 90°) and
+     `triggerToJointAngle()` for the trigger-driven gripper (spans its full
+     range from the trigger's natural 0 rest position).
 
 Because the logic layer never includes `Arduino.h`, it compiles and runs on
 a laptop with a plain C++ compiler. That's what makes the arm's control
@@ -78,4 +85,8 @@ The original planning document described a larger robot: a two-wheel
 drivetrain, an ESP32-CAM for vision, a facial-expression display, and a
 DFPlayer Mini for text-to-speech, with a second ("Part B") phase for
 autonomous navigation. None of that was built. This repository documents
-and tests only the arm + PS4 controller system described above.
+and tests only the 5-servo arm + PS4 controller system described above.
+
+The parts kit also includes an Arduino Leonardo and 4 potentiometers from
+early prototyping; they're not part of the finished control scheme — see
+[docs/BOM.md](BOM.md).

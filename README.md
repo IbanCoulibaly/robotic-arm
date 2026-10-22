@@ -6,14 +6,16 @@
 [![Status: Finished](https://img.shields.io/badge/status-finished-brightgreen)](docs/ARCHITECTURE.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Status: finished.** A 3-servo robot arm, controlled directly by a PS4
-DualShock controller through an ESP32 and a PCA9685 PWM driver. That's the
-complete, working system — no drivetrain, camera, display, or speaker.
+**Status: finished.** A 5-servo robot arm — base, shoulder, elbow, and
+wrist on 20kg digital servos, plus a 9g micro-servo gripper — controlled
+directly by a PS4 DualShock controller through an ESP32 and a PCA9685 PWM
+driver. That's the complete, working system — no drivetrain, camera,
+display, or speaker.
 
-The firmware's control logic — joystick deadzone filtering, axis
+The firmware's control logic — joystick/trigger deadzone filtering, axis
 normalization, and servo angle mapping with per-joint mechanical safety
 limits — is written as plain, hardware-independent C++ and covered by a
-native unit test suite: **12 test cases, 28 assertions, 100% line
+native unit test suite: **18 test cases, 41 assertions, 100% line
 coverage**, running in CI on every push. See
 [Testing & Metrics](#testing--metrics).
 
@@ -29,11 +31,14 @@ coverage**, running in CI on every push. See
 ## How it works
 
 A PS4 DualShock controller pairs to the ESP32 over Bluetooth. On every
-~20 ms control-loop tick, the firmware reads three stick axes and maps each
-one directly to a servo joint: left stick Y → base, right stick X →
-shoulder, right stick Y → elbow. Each axis is deadzone-filtered, then
-mapped to an angle that is clamped to that joint's configured safe range,
-then converted to a PWM pulse and written to the PCA9685 over I2C.
+~20 ms control-loop tick, the firmware reads both sticks and the R2
+trigger, and maps each one directly to a servo joint: left stick X → base,
+left stick Y → shoulder, right stick Y → elbow, right stick X → wrist, and
+the R2 trigger → gripper open/close. Each stick axis is deadzone-filtered
+and mapped to an angle centered at 90° and clamped to that joint's safe
+range; the trigger is normalized and mapped linearly across the gripper's
+full range. Every angle is then converted to a PWM pulse and written to the
+PCA9685 over I2C.
 
 **System architecture** — the complete, finished wiring:
 
@@ -62,12 +67,12 @@ robotic-arm/
 │   │   ├── controller_input.h
 │   │   └── servo_control.h
 │   └── src/
-│       ├── controller_input.cpp   # Deadzone + stick normalization
+│       ├── controller_input.cpp   # Deadzone + stick/trigger normalization
 │       ├── servo_control.cpp      # Angle<->pulse mapping, joint limits
 │       └── main.cpp               # ESP32 entry point (hardware glue only)
 ├── test/
 │   ├── minitest.h           # ~80-line dependency-free test framework
-│   └── test_main.cpp        # 12 unit tests for the logic layer
+│   └── test_main.cpp        # 18 unit tests for the logic layer
 ├── scripts/
 │   └── run_tests.sh         # Build, run, and report coverage locally / in CI
 ├── docs/
@@ -83,9 +88,10 @@ robotic-arm/
 Full bill of materials: [docs/BOM.md](docs/BOM.md).
 Pin map and bus assignments: [docs/WIRING.md](docs/WIRING.md).
 
-Complete component list: ESP32 DevKit · PCA9685 servo driver · 3 servo
-motors (base/shoulder/elbow) · PS4 DualShock controller · 3D-printed single
-arm ([reference model](https://www.printables.com/model/818975-compact-robot-arm-arduino-3d-printed/files)).
+Complete component list: ESP32 DevKit · PCA9685 servo driver · 4× 20kg
+digital servo (base/shoulder/elbow/wrist) · 1× 9g micro servo (gripper) ·
+PS4 DualShock controller · 3D-printed single arm
+([reference model](https://www.printables.com/model/818975-compact-robot-arm-arduino-3d-printed/files)).
 
 ## Getting started
 
@@ -123,17 +129,18 @@ see the badge at the top of this README.
 
 | Metric | Result |
 |---|---|
-| Test cases | 12 |
-| Assertions | 28 |
+| Test cases | 18 |
+| Assertions | 41 |
 | Failures | 0 |
-| `controller_input.cpp` line coverage | 100% (9/9 lines) |
-| `servo_control.cpp` line coverage | 100% (16/16 lines) |
+| `controller_input.cpp` line coverage | 100% (16/16 lines) |
+| `servo_control.cpp` line coverage | 100% (23/23 lines) |
 
-What's covered: joystick deadzone edge cases (including a custom deadzone
-width), stick-axis normalization at its endpoints and midpoint, servo
-angle↔pulse mapping at its endpoints and midpoint, out-of-range input
-clamping for both sticks and angles, and that every joint's configured
-safety range is internally consistent (`min < max`).
+What's covered: joystick and trigger deadzone edge cases (including a
+custom deadzone width), stick/trigger axis normalization at their
+endpoints and midpoints, servo angle↔pulse mapping at its endpoints and
+midpoint, out-of-range input clamping for sticks, triggers, and angles, and
+that every joint's configured safety range is internally consistent
+(`min < max`).
 
 `main.cpp` is intentionally excluded from this suite — it's ESP32-only
 hardware glue (`PS4Controller`, `Wire`, `Adafruit_PWMServoDriver`) with no

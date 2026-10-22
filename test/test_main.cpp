@@ -36,6 +36,24 @@ TEST_CASE(stick_axis_respects_custom_deadzone) {
     ASSERT_TRUE(normalizeStickAxis(40, /*deadzone=*/30) != 0.0f);
 }
 
+TEST_CASE(trigger_axis_zeroes_small_noise) {
+    ASSERT_EQ(normalizeTriggerAxis(0), 0.0f);
+    ASSERT_EQ(normalizeTriggerAxis(4), 0.0f);
+}
+
+TEST_CASE(trigger_axis_boundary_is_exclusive) {
+    ASSERT_TRUE(normalizeTriggerAxis(5) != 0.0f);
+}
+
+TEST_CASE(trigger_axis_normalizes_to_unit_range) {
+    ASSERT_NEAR(normalizeTriggerAxis(255), 1.0f, 0.001);
+    ASSERT_NEAR(normalizeTriggerAxis(128), 0.502f, 0.01);
+}
+
+TEST_CASE(trigger_axis_never_goes_negative) {
+    ASSERT_TRUE(normalizeTriggerAxis(0) >= 0.0f);
+}
+
 // ------------------------------- servo_control -------------------------------
 TEST_CASE(angle_to_pulse_endpoints) {
     ASSERT_EQ(angleToPulse(0), kServoMinPulse);
@@ -76,15 +94,32 @@ TEST_CASE(stick_to_joint_angle_clamps_out_of_range_stick_input) {
     ASSERT_EQ(stickToJointAngle(-5.0f, fullRange), 0);
 }
 
+TEST_CASE(trigger_to_joint_angle_spans_full_range) {
+    ArmJointLimits gripper{40, 140};
+    ASSERT_EQ(triggerToJointAngle(0.0f, gripper), 40);
+    ASSERT_EQ(triggerToJointAngle(1.0f, gripper), 140);
+    ASSERT_EQ(triggerToJointAngle(0.5f, gripper), 90);
+}
+
+TEST_CASE(trigger_to_joint_angle_clamps_out_of_range_trigger_input) {
+    ArmJointLimits gripper{40, 140};
+    ASSERT_EQ(triggerToJointAngle(-1.0f, gripper), 40);
+    ASSERT_EQ(triggerToJointAngle(2.0f, gripper), 140);
+}
+
 TEST_CASE(each_joint_limit_used_in_firmware_is_internally_consistent) {
     // Guards against a typo in main.cpp's joint-limit constants producing
     // min > max, which would silently invert clampAngle's behavior.
     ArmJointLimits base{0, 180};
     ArmJointLimits shoulder{20, 160};
     ArmJointLimits elbow{10, 170};
+    ArmJointLimits wrist{0, 180};
+    ArmJointLimits gripper{40, 140};
     ASSERT_TRUE(base.minAngle < base.maxAngle);
     ASSERT_TRUE(shoulder.minAngle < shoulder.maxAngle);
     ASSERT_TRUE(elbow.minAngle < elbow.maxAngle);
+    ASSERT_TRUE(wrist.minAngle < wrist.maxAngle);
+    ASSERT_TRUE(gripper.minAngle < gripper.maxAngle);
 }
 
 // ------------------------------------- runner ---------------------------------

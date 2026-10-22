@@ -26,4 +26,14 @@ int stickToJointAngle(float normalizedStick, const ArmJointLimits& limits) {
     return clampAngle(static_cast<int>(std::lround(angle)), limits.minAngle, limits.maxAngle);
 }
 
+int triggerToJointAngle(float normalizedTrigger, const ArmJointLimits& limits) {
+    float clamped = normalizedTrigger;
+    if (clamped > 1.0f) clamped = 1.0f;
+    if (clamped < 0.0f) clamped = 0.0f;
+
+    float angle = static_cast<float>(limits.minAngle) +
+                  clamped * static_cast<float>(limits.maxAngle - limits.minAngle);
+    return clampAngle(static_cast<int>(std::lround(angle)), limits.minAngle, limits.maxAngle);
+}
+
 }  // namespace robotic_arm

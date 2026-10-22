@@ -22,9 +22,14 @@ struct ArmJointLimits {
 };
 
 // Converts a normalized stick axis in [-1.0, 1.0] into a servo angle
-// centered at 90 degrees, respecting the joint's configured limits. This is
-// the single choke point that keeps a full-deflection joystick input from
-// ever commanding a joint past its mechanical stop.
+// centered at 90 degrees, respecting the joint's configured limits. Used
+// for the 4 main arm joints (base, shoulder, elbow, wrist).
 int stickToJointAngle(float normalizedStick, const ArmJointLimits& limits);
+
+// Converts a normalized trigger reading in [0.0, 1.0] into a servo angle
+// spanning the joint's full configured range: 0.0 -> minAngle, 1.0 ->
+// maxAngle. Used for the gripper's micro servo, which has no rest-centered
+// "neutral" position the way an arm joint does.
+int triggerToJointAngle(float normalizedTrigger, const ArmJointLimits& limits);
 
 }  // namespace robotic_arm
