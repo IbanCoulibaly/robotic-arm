@@ -1,0 +1,72 @@
+<svg viewBox="0 0 980 560" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="seq-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="560" fill="#ffffff"/>
+  <text x="490" y="26" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">One Control-Loop Tick (loop(), ~50 Hz)</text>
+  <text x="490" y="45" text-anchor="middle" font-size="13" fill="#64748b">Sequence from a controller input to every actuator and the display</text>
+
+  <!-- lifeline headers -->
+  <rect x="30" y="64" width="140" height="34" rx="8" fill="#eef2ff" stroke="#334155" stroke-width="2"/>
+  <text x="100" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0f172a">PS4 Controller</text>
+
+  <rect x="290" y="64" width="160" height="34" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
+  <text x="370" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0f172a">ESP32 loop()</text>
+
+  <rect x="490" y="64" width="140" height="34" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+  <text x="560" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#064e3b">L298N</text>
+
+  <rect x="630" y="64" width="140" height="34" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+  <text x="700" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#064e3b">PCA9685</text>
+
+  <rect x="780" y="64" width="140" height="34" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+  <text x="850" y="86" text-anchor="middle" font-size="12.5" font-weight="700" fill="#064e3b">Display</text>
+
+  <!-- lifelines -->
+  <line x1="100" y1="98" x2="100" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="370" y1="98" x2="370" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="560" y1="98" x2="560" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="700" y1="98" x2="700" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="850" y1="98" x2="850" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+  <!-- 1: controller report -->
+  <text x="235" y="118" text-anchor="middle" font-size="11.5" fill="#334155">Bluetooth HID report: sticks + buttons (~50&#160;Hz)</text>
+  <line x1="100" y1="128" x2="370" y2="128" stroke="#334155" stroke-width="2" marker-end="url(#seq-arrow)"/>
+
+  <!-- self-call 1: normalize + mix -->
+  <path d="M370,150 C440,150 440,182 370,182" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#seq-arrow)"/>
+  <text x="452" y="162" font-size="11.5" font-weight="600" fill="#1e3a8a">1. normalizeStickAxis()</text>
+  <text x="452" y="177" font-size="11.5" fill="#1e3a8a">   mixArcadeDrive() → MotorOutput</text>
+
+  <!-- 2: drive motors -->
+  <text x="465" y="203" text-anchor="middle" font-size="11.5" fill="#334155">digitalWrite(IN1/IN2); analogWrite(ENA/ENB)</text>
+  <line x1="370" y1="213" x2="560" y2="213" stroke="#334155" stroke-width="2" marker-end="url(#seq-arrow)"/>
+
+  <!-- self-call 2: servo mapping -->
+  <path d="M370,235 C440,235 440,267 370,267" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#seq-arrow)"/>
+  <text x="452" y="247" font-size="11.5" font-weight="600" fill="#1e3a8a">2. stickToJointAngle()</text>
+  <text x="452" y="262" font-size="11.5" fill="#1e3a8a">   angleToPulse() → pulse ×4</text>
+
+  <!-- 3: drive servos -->
+  <text x="535" y="288" text-anchor="middle" font-size="11.5" fill="#334155">setPWM(channel, 0, pulse) ×4 — I2C @ GPIO 21/22</text>
+  <line x1="370" y1="298" x2="700" y2="298" stroke="#334155" stroke-width="2" marker-end="url(#seq-arrow)"/>
+
+  <!-- self-call 3: expression -->
+  <path d="M370,320 C440,320 440,352 370,352" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#seq-arrow)"/>
+  <text x="452" y="332" font-size="11.5" font-weight="600" fill="#1e3a8a">3. determineExpression()</text>
+  <text x="452" y="347" font-size="11.5" fill="#1e3a8a">   (buttons, isSpeaking)</text>
+
+  <!-- 4: render face -->
+  <text x="610" y="373" text-anchor="middle" font-size="11.5" fill="#334155">render expression (I2C / SPI)</text>
+  <line x1="370" y1="383" x2="850" y2="383" stroke="#334155" stroke-width="2" marker-end="url(#seq-arrow)"/>
+
+  <!-- loop note -->
+  <rect x="270" y="410" width="440" height="50" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+  <text x="490" y="440" text-anchor="middle" font-size="12.5" fill="#78350f">delay(20&#160;ms) → loop() repeats (~50&#160;Hz control rate)</text>
+
+  <path d="M270,435 C60,435 60,128 90,128" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#seq-arrow)"/>
+  <text x="56" y="280" font-size="11.5" fill="#92400e" transform="rotate(-90 40 280)" text-anchor="middle">next tick</text>
+</svg>

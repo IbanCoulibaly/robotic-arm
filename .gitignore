@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+*.o
+*.gcno
+*.gcda
+*.gcov
+
+# PlatformIO / Arduino
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Node (unrelated stray tooling in this directory)
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
